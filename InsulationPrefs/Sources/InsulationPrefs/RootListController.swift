@@ -33,6 +33,9 @@ class RootListController: PSListController {
         let keyString = key as! String;
         if keyString == "thermalPuppetValue" {
             IPNotificationHelper.shared.sendMsg(name: "com.be-huge.insulation-executePuppetEvent");
+        } else if keyString.hasPrefix("charge") {
+            // 充电限制配置变更：通知 thermalmonitord 内的控制器热生效
+            IPNotificationHelper.shared.sendMsg(name: "com.be-huge.insulation-chargeConfigChanged");
         }
     }
 }

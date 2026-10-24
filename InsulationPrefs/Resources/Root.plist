@@ -64,6 +64,94 @@
 				<string>重度</string>
 			</array>
 		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>充电限制（移植 ChargeLimiter）</string>
+			<key>footerText</key>
+			<string>电量达到停充阈值后，通过 PredictiveChargingInhibit 停充；可选同时禁流。电量下降 X%（恢复回差，可填任意值，不固定 5%）后，先恢复输入再恢复充电。电量 ≤5% 会强制充电兜底。核心移植自 ChargeLimiter（GPL-3.0）。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.be-huge.insulation-prefs</string>
+			<key>key</key>
+			<string>chargeLimitEnabled</string>
+			<key>label</key>
+			<string>启用充电限制</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>default</key>
+			<string>80</string>
+			<key>defaults</key>
+			<string>com.be-huge.insulation-prefs</string>
+			<key>isNumeric</key>
+			<string>true</string>
+			<key>key</key>
+			<string>chargeLimitAbove</string>
+			<key>keyboard</key>
+			<string>numbers</string>
+			<key>label</key>
+			<string>停充阈值（%）</string>
+			<key>placeholder</key>
+			<string>达到该电量停充，如 80</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>default</key>
+			<string>5</string>
+			<key>defaults</key>
+			<string>com.be-huge.insulation-prefs</string>
+			<key>isNumeric</key>
+			<string>true</string>
+			<key>key</key>
+			<string>chargeResumeDrop</string>
+			<key>keyboard</key>
+			<string>numbers</string>
+			<key>label</key>
+			<string>恢复回差（下降 X%）</string>
+			<key>placeholder</key>
+			<string>电量下降百分之几后恢复充电，默认 5，可改任意值</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.be-huge.insulation-prefs</string>
+			<key>key</key>
+			<string>chargeDisableInflow</string>
+			<key>label</key>
+			<string>停充时同时禁流</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>高级</string>
+			<key>footerText</key>
+			<string>优先使用 AppleSmartBattery 读取电量（iPhone 8+）；不支持时自动回退 IOPMPowerSource。一般保持开启。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.be-huge.insulation-prefs</string>
+			<key>key</key>
+			<string>chargePreferSmartBattery</string>
+			<key>label</key>
+			<string>优先 AppleSmartBattery</string>
+		</dict>
 	</array>
 	<key>title</key>
 	<string>Insulation</string>

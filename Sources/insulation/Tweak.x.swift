@@ -48,5 +48,7 @@ class InsulationTInit: Tweak {
     CFNotificationCenterAddObserver(center, observer, { _, _, _, _, _ in
       IPowerHepler.shared.executePuppetEvent();
     }, executePuppetEventName, nil, .deliverImmediately);
+    // 充电限制核心（移植 ChargeLimiter）：boot 内部读配置，未启用则不动作
+    ChargeLimitController.shared.boot();
   }
 }
