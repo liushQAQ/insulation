@@ -22,20 +22,32 @@
 
 // theos 头件库的 IOKitLib.h 未收录此 API（IOKit 框架二进制内存在，iOS 可用，
 // macOS 10.7+ 同名同签名），自行补原型即可；若上游头日后收录则为等价重声明。
+// 本文件是 ObjC++：不包 extern "C" 会被 C++ 名字修饰，链接时找不到 C 符号
+// （第一次 CI 打包即栽在这：Undefined symbols + "declaration possibly missing
+// extern \"C\""）。
+extern "C" {
 extern void IONotificationPortSetDispatchQueue(IONotificationPortRef notify,
                                                dispatch_queue_t queue);
+}
 
 #import "ChargeLimitController.h"
+#import "JBRootPath.h"
 
 // === 移植自 ChargeLimiter daemon.mm 的常量（按需裁剪）====================
 static const NSInteger kCriticalLowLevel = 5;        // ≤5% 强充兜底（与上游一致）
 static const NSTimeInterval kPollInterval = 30.0;    // 轮询兜底间隔（秒）
 static const NSUInteger kMaxTransitionLog = 50;      // 状态流水保留条数
 
-static NSString *const kPrefsPath =
-    @"/var/mobile/Library/Preferences/com.be-huge.insulation-prefs.plist";
-static NSString *const kStatusPath =
-    @"/var/mobile/Library/Preferences/com.be-huge.insulation-charge-status.plist";
+// 配置/状态 plist 路径须带越狱根前缀（roothide /var/.jbroot-*、rootless /var/jb、
+// rootful 原样），运行时探测，见 JBRootPath.h。
+static NSString *CLPrefsPath(void) {
+    return JBRootPrefixedPath(
+        @"/var/mobile/Library/Preferences/com.be-huge.insulation-prefs.plist");
+}
+static NSString *CLStatusPath(void) {
+    return JBRootPrefixedPath(
+        @"/var/mobile/Library/Preferences/com.be-huge.insulation-charge-status.plist");
+}
 
 /// 设置面板改完充电限制配置后广播，tweak 侧热生效（与 thermalPuppetEvent 同套路）
 NSString *const kChargeConfigChangedNotify = @"com.be-huge.insulation-chargeConfigChanged";
@@ -200,7 +212,7 @@ static void chargeConfigChangedCallback(CFNotificationCenterRef center, void *ob
 #pragma mark - 配置
 
 - (void)loadConfig {
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kPrefsPath] ?: @{};
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:CLPrefsPath()] ?: @{};
     self.enabled = CLBoolValue(prefs[@"chargeLimitEnabled"], NO);
     self.threshold = CLIntValue(prefs[@"chargeLimitAbove"], 80);
     if (self.threshold < 1 || self.threshold > 100) self.threshold = 80;
@@ -489,7 +501,7 @@ static void chargeConfigChangedCallback(CFNotificationCenterRef center, void *ob
             @"inflowEnabled": @(self.inflowEnabled),
             @"transitions": [self.transitions copy],
         };
-        [payload writeToFile:kStatusPath atomically:YES];
+        [payload writeToFile:CLStatusPath() atomically:YES];
     }
 }
 
