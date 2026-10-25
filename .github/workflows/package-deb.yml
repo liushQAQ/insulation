@@ -35,7 +35,7 @@ jobs:
           echo "THEOS=$THEOS" >> "$GITHUB_ENV"
 
       - name: Package
-        run: ./package-deb.sh
+        run: bash package-deb.sh
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
