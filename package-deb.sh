@@ -34,7 +34,7 @@ if [ -z "$THEOS_DIR" ]; then
 fi
 for scheme in rootless roothide; do
   if [ ! -d "$THEOS_DIR/vendor/mod/$scheme" ]; then
-    echo "=== 跳过 scheme=$scheme（当前 theos 无此 scheme 模块）==="
+    echo "=== 跳过 scheme=${scheme}（当前 theos 无此 scheme 模块）==="
     continue
   fi
   echo "=== 打包 scheme=$scheme ==="
