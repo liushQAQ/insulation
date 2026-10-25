@@ -1,0 +1,38 @@
+--- !tapi-tbd-v4
+targets: [ arm64-ios, arm64e-ios ]
+install-name: /System/Library/PrivateFrameworks/Preferences.framework/Preferences
+current-version: 1
+compatibility-version: 1
+exports:
+  - targets: [ arm64-ios, arm64e-ios ]
+    symbols:
+      - _OBJC_CLASS_$_PSBundleController
+      - _OBJC_METACLASS_$_PSBundleController
+      - _OBJC_CLASS_$_PSControlTableCell
+      - _OBJC_METACLASS_$_PSControlTableCell
+      - _OBJC_CLASS_$_PSDiscreteSlider
+      - _OBJC_METACLASS_$_PSDiscreteSlider
+      - _OBJC_CLASS_$_PSEditableTableCell
+      - _OBJC_METACLASS_$_PSEditableTableCell
+      - _OBJC_CLASS_$_PSHeaderFooterView
+      - _OBJC_METACLASS_$_PSHeaderFooterView
+      - _OBJC_CLASS_$_PSListController
+      - _OBJC_METACLASS_$_PSListController
+      - _OBJC_CLASS_$_PSListItemsController
+      - _OBJC_METACLASS_$_PSListItemsController
+      - _OBJC_CLASS_$_PSRootController
+      - _OBJC_METACLASS_$_PSRootController
+      - _OBJC_CLASS_$_PSSliderTableCell
+      - _OBJC_METACLASS_$_PSSliderTableCell
+      - _OBJC_CLASS_$_PSSpecifier
+      - _OBJC_METACLASS_$_PSSpecifier
+      - _OBJC_CLASS_$_PSSwitchTableCell
+      - _OBJC_METACLASS_$_PSSwitchTableCell
+      - _OBJC_CLASS_$_PSSystemPolicyForApp
+      - _OBJC_METACLASS_$_PSSystemPolicyForApp
+      - _OBJC_CLASS_$_PSTableCell
+      - _OBJC_METACLASS_$_PSTableCell
+      - _OBJC_CLASS_$_PSViewController
+      - _OBJC_METACLASS_$_PSViewController
+      - _OBJC_CLASS_$_PreferencesAppController
+      - _OBJC_METACLASS_$_PreferencesAppController
