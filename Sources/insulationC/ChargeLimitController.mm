@@ -11,7 +11,19 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreFoundation/CoreFoundation.h>
-#import <IOKit/IOKit.h>
+// 注意：theos 自带的 vendor/include/IOKit/IOKit.h 是坏桩头（内容只有一行字面量
+// "IOKitLib.h"），解析报错后 clang 的错误恢复会吞 token 找 ';'，连带把后续
+// #import 进来的 ObjC 声明上下文毁掉（@interface 被吞 → 剩余 @property 全报
+// unexpected '@'）。只引分体真实头，永不引这个伞头。
+#import <IOKit/IOTypes.h>
+#import <IOKit/IOReturn.h>
+#import <IOKit/IOKitLib.h>
+#import <dispatch/dispatch.h>
+
+// theos 头件库的 IOKitLib.h 未收录此 API（IOKit 框架二进制内存在，iOS 可用，
+// macOS 10.7+ 同名同签名），自行补原型即可；若上游头日后收录则为等价重声明。
+extern void IONotificationPortSetDispatchQueue(IONotificationPortRef notify,
+                                               dispatch_queue_t queue);
 
 #import "ChargeLimitController.h"
 
@@ -144,9 +156,10 @@ static void chargeConfigChangedCallback(CFNotificationCenterRef center, void *ob
     });
     // 监听设置面板的配置变更（Darwin 通知，主线程 run loop 投递）
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+    // Darwin 中心的挂起行为形参按惯例传 Coalesce（实际投递不受它影响，恒为立即）
     CFNotificationCenterAddObserver(center, (__bridge void *)self, chargeConfigChangedCallback,
                                     (__bridge CFStringRef)kChargeConfigChangedNotify, NULL,
-                                    kCFNotificationDeliverImmediately);
+                                    CFNotificationSuspensionBehaviorCoalesce);
 }
 
 - (void)handleConfigChanged {
