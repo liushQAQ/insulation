@@ -34,6 +34,33 @@ jobs:
           ls "$THEOS/sdks/"
           echo "THEOS=$THEOS" >> "$GITHUB_ENV"
 
+      - name: Neutralize fakeroot for CI runner
+        run: |
+          # 背景：theos 打包 deb 时经 $THEOS/bin/fakeroot.sh 调 homebrew fakeroot，
+          # 后者以 DYLD_INSERT_LIBRARIES 注入 libfakeroot.dylib（arm64）。macOS
+          # runner 上该注入链中会出现 arm64e 进程，dyld 直接 abort
+          # （实测 make internal-package Error 134 / Abort trap: 6）。
+          # dm.pl 写 ar 记录时 uid/gid 硬编码为 0，本就不需要假 root，直接透传。
+          {
+            echo '#!/usr/bin/env bash'
+            echo 'while [[ $# -gt 0 ]]; do'
+            echo '  case "$1" in'
+            echo '    -p) shift 2 ;;'
+            echo '    -r|-c) shift ;;'
+            echo '    *) break ;;'
+            echo '  esac'
+            echo 'done'
+            echo '[[ $# -eq 0 ]] && exit 0'
+            echo 'exec "$@"'
+          } > "$THEOS/bin/fakeroot.sh"
+          chmod +x "$THEOS/bin/fakeroot.sh"
+          echo "--- patched fakeroot.sh ---"
+          cat "$THEOS/bin/fakeroot.sh"
+          echo "--- packaging toolchain diag ---"
+          ls -l "$THEOS/bin/dm.pl"
+          command -v lzma gzip xz 2>/dev/null || true
+          for t in lzma gzip xz; do p=$(command -v "$t" 2>/dev/null) && lipo -info "$p" 2>/dev/null || true; done
+
       - name: Package
         run: bash package-deb.sh
 
