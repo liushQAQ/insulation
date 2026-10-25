@@ -1,0 +1,45 @@
+name: Package deb
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install ldid dpkg fakeroot
+
+      - name: Select Xcode
+        run: |
+          if [ -d /Applications/Xcode_15.4.app ]; then
+            sudo xcode-select -s /Applications/Xcode_15.4.app
+          fi
+          xcodebuild -version
+          swift --version
+
+      - name: Setup theos
+        run: |
+          set -euo pipefail
+          export THEOS="$HOME/theos"
+          # --recursive 自动带齐 submodules：dm.pl/headers/lib/logos/nic/templates/swift-support/orion
+          git clone --recursive --depth 1 https://github.com/theos/theos.git "$THEOS"
+          # SDK：取 theos/sdks 的 iPhoneOS16.5，链成 theos 识别的 iPhoneOS.sdk
+          mkdir -p "$THEOS/sdks"
+          curl -sL https://github.com/theos/sdks/tarball/HEAD | tar xz -C "$THEOS/sdks" --strip-components=1
+          ln -sfn iPhoneOS16.5.sdk "$THEOS/sdks/iPhoneOS.sdk"
+          ls "$THEOS/sdks/"
+          echo "THEOS=$THEOS" >> "$GITHUB_ENV"
+
+      - name: Package
+        run: ./package-deb.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: insulation-deb
+          path: dist/*.deb
+          if-no-files-found: error
